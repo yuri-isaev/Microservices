@@ -26,8 +26,7 @@ public class EventBusSubscriptionManager : IEventBusSubscriptionManager
   public void Clear() => _handlers.Clear();
 
   public void AddSubscription<TEvent, THandler>()
-    where TEvent : IntegrationEvent
-    where THandler : IIntegrationEventHandler<TEvent>
+    where TEvent : IntegrationEvent where THandler : IIntegrationEventHandler<TEvent>
   {
     var eventName = GetEventKey<TEvent>();
     AddSubscription(typeof(THandler), eventName);
@@ -55,8 +54,7 @@ public class EventBusSubscriptionManager : IEventBusSubscriptionManager
   }
 
   public void RemoveSubscription<TEvent, THandler>()
-    where THandler : IIntegrationEventHandler<TEvent>
-    where TEvent : IntegrationEvent
+    where THandler : IIntegrationEventHandler<TEvent> where TEvent : IntegrationEvent
   {
     var handlerToRemove = FindSubscriptionToRemove<TEvent, THandler>();
     var eventName = GetEventKey<TEvent>();
@@ -98,8 +96,7 @@ public class EventBusSubscriptionManager : IEventBusSubscriptionManager
   }
 
   private SubscriptionInfo FindSubscriptionToRemove<TEvent, THandler>()
-    where TEvent : IntegrationEvent
-    where THandler : IIntegrationEventHandler<TEvent>
+    where TEvent : IntegrationEvent where THandler : IIntegrationEventHandler<TEvent>
   {
     var eventName = GetEventKey<TEvent>();
     return FindSubscriptionToRemove(eventName, typeof(THandler));
