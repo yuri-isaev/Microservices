@@ -8,9 +8,11 @@ public interface IEventBusSubscriptionManager
 
   event EventHandler<string> OnEventRemoved;
 
-  void AddSubscription<TEvent, THandler>() where TEvent : IntegrationEvent where THandler : IIntegrationEventHandler<TEvent>;
+  void AddSubscription<TEvent, THandler>()
+    where TEvent : IntegrationEvent where THandler : IIntegrationEventHandler<TEvent>;
 
-  void RemoveSubscription<TEvent, THandler>() where THandler : IIntegrationEventHandler<TEvent> where TEvent : IntegrationEvent;
+  void RemoveSubscription<TEvent, THandler>()
+    where THandler : IIntegrationEventHandler<TEvent> where TEvent : IntegrationEvent;
 
   bool HasSubscriptionsForEvent<TEvent>() where TEvent : IntegrationEvent;
 
