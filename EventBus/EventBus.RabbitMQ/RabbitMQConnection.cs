@@ -64,9 +64,9 @@ public class RabbitMQConnection : IDisposable
       if (IsConnected)
       {
         // Connection subscribe to events
-        _connection.ConnectionShutdown += ConnectionShutdown;
-        _connection.CallbackException  += ConnectionCallbackException;
-        _connection.ConnectionBlocked  += ConnectionBlocked;
+        _connection.ConnectionShutdown += ConnectionShutdown!;
+        _connection.CallbackException  += ConnectionCallbackException!;
+        _connection.ConnectionBlocked  += ConnectionBlocked!;
         return true;
       }
 

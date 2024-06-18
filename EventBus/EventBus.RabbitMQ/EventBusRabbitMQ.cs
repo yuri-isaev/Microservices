@@ -17,7 +17,7 @@ namespace EventBus.RabbitMQ;
 /// subscribing to events,
 /// managing the lifecycle of the consumer channel.
 /// </summary>
-public class EventBusRabbitMq : BaseEventBus
+public class EventBusRabbitMQ : BaseEventBus
 {
   private readonly IConnectionFactory _connectionFactory; 
   private readonly IModel _consumerChannel;
@@ -30,7 +30,7 @@ public class EventBusRabbitMq : BaseEventBus
   /// </summary>
   /// <param name="config">Configuration settings for the event bus.</param>
   /// <param name="provider">Service provider for dependency injection.</param>
-  public EventBusRabbitMq(EventBusConfig config, IServiceProvider provider) : base(config, provider)
+  public EventBusRabbitMQ(EventBusConfig config, IServiceProvider provider) : base(config, provider)
   {
     var connection = EventBusConfig.Connection;
     
@@ -38,7 +38,7 @@ public class EventBusRabbitMq : BaseEventBus
     {
       if (connection is ConnectionFactory)
       {
-        _connectionFactory = connection as ConnectionFactory;
+        _connectionFactory = (connection as ConnectionFactory)!;
       }
       else
       {
@@ -47,7 +47,7 @@ public class EventBusRabbitMq : BaseEventBus
           ReferenceLoopHandling = ReferenceLoopHandling.Ignore
         });
 
-        _connectionFactory = JsonConvert.DeserializeObject<ConnectionFactory>(connJson);
+        _connectionFactory = JsonConvert.DeserializeObject<ConnectionFactory>(connJson)!;
       }
     }
     else
@@ -60,7 +60,7 @@ public class EventBusRabbitMq : BaseEventBus
     _consumerChannel = CreateConsumerChannel();
     // Subscription to the `OnEventRemoved` event of the subscription manager (`SubsManager`).
     // When the event is removed, the `SubsManagerOnEventRemoved` method will be called.
-    SubsManager.OnEventRemoved += SubsManagerOnEventRemoved;
+    SubsManager.OnEventRemoved += SubsManagerOnEventRemoved!;
   }
   
   /// <summary>
@@ -131,9 +131,9 @@ public class EventBusRabbitMq : BaseEventBus
   /// <summary>
   /// Subscribes to an event with a specified event handler.
   /// </summary>
-  public override void Subscribe<T, TH>()
+  public override void Subscribe<TEvent,THandler>()
   {
-    var eventName = typeof(T).Name;
+    var eventName = typeof(TEvent).Name;
     eventName = ProcessEventName(eventName);
 
     if (!SubsManager.HasSubscriptionsForEvent(eventName))
@@ -155,16 +155,16 @@ public class EventBusRabbitMq : BaseEventBus
       );
     }
 
-    SubsManager.AddSubscription<T, TH>();
+    SubsManager.AddSubscription<TEvent,THandler>();
     StartBasicConsume(eventName);
   }
 
   /// <summary>
   /// Unsubscribes from an event with a specified event handler.
   /// </summary>
-  public override void UnSubscribe<T, TH>()
+  public override void UnSubscribe<TEvent,THandler>()
   {
-    SubsManager.RemoveSubscription<T, TH>();
+    SubsManager.RemoveSubscription<TEvent,THandler>();
   }
   
   /// <summary>
@@ -190,7 +190,7 @@ public class EventBusRabbitMq : BaseEventBus
     if (_consumerChannel != null)
     {
       var consumer = new EventingBasicConsumer(_consumerChannel);
-      consumer.Received += ConsumerReceived;
+      consumer.Received += ConsumerReceived!;
 
       _consumerChannel.BasicConsume(queue: GetSubName(eventName), autoAck: false, consumer: consumer);
     }

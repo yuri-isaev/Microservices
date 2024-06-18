@@ -14,7 +14,7 @@ public class EventBusConfig
   
   public string EventNameSuffix { get; set; } = "IntegrationEvent";
   
-  public EventBusType EventBusType { get; set; } = EventBusType.RabbitMq;
+  public EventBusType EventBusType { get; set; } = EventBusType.RabbitMQ;
   
   public object? Connection { get; set; } 
   
@@ -25,6 +25,6 @@ public class EventBusConfig
 
 public enum EventBusType
 {
-  RabbitMq = 0,
+  RabbitMQ = 0,
   AzureServiceBus = 1
 }

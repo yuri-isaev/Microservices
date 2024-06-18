@@ -3,6 +3,7 @@ using EventBus.Base;
 using EventBus.Base.Events;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Management;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -20,7 +21,7 @@ public class EventBusService : BaseEventBus
 
   public EventBusService(EventBusConfig config, IServiceProvider serviceProvider) : base(config, serviceProvider)
   {
-    _logger = (serviceProvider.GetService(typeof(ILogger<EventBusService>)) as ILogger<EventBusService>)!;
+    _logger = serviceProvider.GetRequiredService<ILogger<EventBusService>>();
     _managementClient = new ManagementClient(config.EventBusConnectionString);
     _topicClient = CreateTopicClient();
   }
@@ -31,19 +32,18 @@ public class EventBusService : BaseEventBus
   /// </summary>
   private ITopicClient CreateTopicClient()
   {
+    var topic = EventBusConfig.DefaultTopicName;
+    
     if (_topicClient == null || _topicClient.IsClosedOrClosing)
     {
-      _topicClient = new TopicClient(EventBusConfig.EventBusConnectionString, EventBusConfig.DefaultTopicName,
-        RetryPolicy.Default);
+      _topicClient = new TopicClient(EventBusConfig.EventBusConnectionString, topic, RetryPolicy.Default);
     }
 
     // Ensure that topic already exists
-    if (!_managementClient.TopicExistsAsync(EventBusConfig.DefaultTopicName).GetAwaiter().GetResult())
-
-      _managementClient
-        .CreateTopicAsync(EventBusConfig.DefaultTopicName)
-        .GetAwaiter()
-        .GetResult();
+    if (!_managementClient.TopicExistsAsync(topic).GetAwaiter().GetResult())
+    {
+      _managementClient.CreateTopicAsync(topic).GetAwaiter().GetResult();
+    }
 
     return _topicClient;
   }
